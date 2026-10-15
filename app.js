@@ -2,7 +2,7 @@
 let habitos = [];
 let registros = [];
 
-// Guarda un valor en una cookie.
+// Guarda un valor en una cookie convirtiéndolo a JSON.
 function guardarCookie(nombre, valor) {
     const contenido = encodeURIComponent(JSON.stringify(valor));
 
@@ -36,13 +36,13 @@ function borrarCookie(nombre) {
     document.cookie = `${nombre}=; max-age=0; path=/; SameSite=Lax`;
 }
 
-// Guarda los dos arrays.
+// Guarda los dos arrays en sus respectivas cookies.
 function guardarTodo() {
     guardarCookie("habitos", habitos);
     guardarCookie("registros", registros);
 }
 
-// Recupera los datos guardados.
+// Recupera los datos guardados en las cookies.
 function cargarTodo() {
     const habitosGuardados = leerCookie("habitos");
     const registrosGuardados = leerCookie("registros");
@@ -68,7 +68,24 @@ function mostrarHabitos() {
     });
 }
 
-// Crea un hábito al enviar el formulario.
+// Rellena el desplegable con los hábitos creados.
+function actualizarDesplegable() {
+    const desplegable = document.getElementById("habito-registro");
+
+    // Conserva una opción inicial para seleccionar el hábito.
+    desplegable.innerHTML = '<option value="">Selecciona un hábito</option>';
+
+    habitos.forEach(function(habito) {
+        const opcion = document.createElement("option");
+
+        opcion.value = habito.id;
+        opcion.textContent = habito.nombre;
+
+        desplegable.appendChild(opcion);
+    });
+}
+
+// Crea un hábito al enviar el primer formulario.
 function crearHabito(evento) {
     evento.preventDefault();
 
@@ -96,10 +113,13 @@ function crearHabito(evento) {
         categoria: categoria
     };
 
-    // Añade el hábito, guarda los datos y actualiza la página.
+    // Añade el hábito y guarda los datos.
     habitos.push(nuevoHabito);
     guardarTodo();
+
+    // Actualiza la lista y el desplegable del segundo formulario.
     mostrarHabitos();
+    actualizarDesplegable();
 
     // Limpia el formulario.
     document.getElementById("form-habito").reset();
@@ -107,12 +127,74 @@ function crearHabito(evento) {
     estado.textContent = "Hábito creado correctamente.";
 }
 
-// Inicializa la aplicación.
+// Crea un registro de un día al enviar el segundo formulario.
+function crearRegistro(evento) {
+    evento.preventDefault();
+
+    const habitoId = Number(document.getElementById("habito-registro").value);
+    const fecha = document.getElementById("fecha").value;
+    const observaciones = document.getElementById("observaciones").value.trim();
+    const cumplido = document.getElementById("cumplido").checked;
+    const estado = document.getElementById("estado");
+
+    // Comprueba que se haya seleccionado un hábito y una fecha.
+    if (!habitoId || !fecha) {
+        estado.textContent = "Selecciona un hábito y una fecha.";
+        return;
+    }
+
+    // Comprueba que el hábito seleccionado exista.
+    const habitoExiste = habitos.some(function(habito) {
+        return habito.id === habitoId;
+    });
+
+    if (!habitoExiste) {
+        estado.textContent = "El hábito seleccionado no existe.";
+        return;
+    }
+
+    // Genera un identificador único para el registro.
+    const id = registros.length > 0
+        ? Math.max(...registros.map(registro => registro.id)) + 1
+        : 1;
+
+    // Crea el objeto del registro.
+    const nuevoRegistro = {
+        id: id,
+        habitoId: habitoId,
+        fecha: fecha,
+        observaciones: observaciones,
+        cumplido: cumplido
+    };
+
+    // Añade el registro y guarda los dos arrays.
+    registros.push(nuevoRegistro);
+    guardarTodo();
+
+    // Limpia el formulario.
+    document.getElementById("form-registro").reset();
+
+    estado.textContent = "Registro guardado correctamente.";
+
+    console.log("Registro creado:", nuevoRegistro);
+}
+
+// Inicializa la aplicación recuperando los datos guardados.
 cargarTodo();
+
+// Muestra los hábitos recuperados.
 mostrarHabitos();
 
+// Rellena el desplegable con los hábitos recuperados.
+actualizarDesplegable();
+
+// Activa el formulario de creación de hábitos.
 document.getElementById("form-habito").addEventListener("submit", crearHabito);
 
+// Activa el formulario de registro de días.
+document.getElementById("form-registro").addEventListener("submit", crearRegistro);
+
+// Mensajes para comprobar el funcionamiento desde la consola.
 console.log("HábitoTracker iniciado.");
 console.log("Hábitos recuperados:", habitos);
 console.log("Registros recuperados:", registros);

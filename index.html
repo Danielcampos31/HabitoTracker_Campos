@@ -39,6 +39,28 @@
         <h2>Mis hábitos</h2>
         <ul id="lista-habitos"></ul>
 
+                <h2>Registrar un día</h2>
+
+        <form id="form-registro">
+            <label for="habito-registro">Hábito:</label>
+            <select id="habito-registro" required>
+                <option value="">Selecciona un hábito</option>
+            </select>
+
+            <label for="fecha">Fecha:</label>
+            <input type="date" id="fecha" required>
+
+            <label for="observaciones">Observaciones:</label>
+            <textarea id="observaciones"></textarea>
+
+            <label>
+                <input type="checkbox" id="cumplido">
+                Hábito cumplido
+            </label>
+
+            <button type="submit">Guardar registro</button>
+        </form>
+
         <p id="estado">Aplicación preparada.</p>
     </main>
 </body>

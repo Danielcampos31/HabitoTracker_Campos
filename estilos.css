@@ -23,3 +23,36 @@ main {
 h2 {
     color: #2563eb;
 }
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+input,
+textarea,
+select,
+button {
+    font-family: Arial, sans-serif;
+    font-size: 15px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+button {
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #1d4ed8;
+}
+
+#cumplido {
+    width: auto;
+}
