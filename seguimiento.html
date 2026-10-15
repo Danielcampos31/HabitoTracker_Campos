@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seguimiento de hábitos</title>
+    <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+    <main>
+        <h1>Seguimiento de hábitos</h1>
+
+        <p id="resumen-registros">Cumplidos: 0 | Fallados: 0</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Hábito</th>
+                    <th>Fecha</th>
+                    <th>Observaciones</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-registros"></tbody>
+        </table>
+    </main>
+
+   
+<script>
+    function mostrarRegistros() {
+        const tabla = document.getElementById("tabla-registros");
+        const resumen = document.getElementById("resumen-registros");
+
+        tabla.innerHTML = "";
+
+        // Comprueba que la ventana se haya abierto desde la página principal.
+        if (!window.opener || window.opener.closed) {
+            resumen.textContent = "Abre el seguimiento desde HábitoTracker.";
+            return;
+        }
+
+        // Recupera los arrays reales de la ventana principal.
+        const habitos = window.opener.habitos;
+        const registros = window.opener.registros;
+
+        if (!Array.isArray(habitos) || !Array.isArray(registros)) {
+            resumen.textContent = "No se han podido recuperar los datos.";
+            return;
+        }
+
+        let cumplidos = 0;
+        let fallados = 0;
+
+        registros.forEach(function(registro) {
+            const habito = habitos.find(function(elemento) {
+                return elemento.id === registro.habitoId;
+            });
+
+            const fila = document.createElement("tr");
+
+            const celdaHabito = document.createElement("td");
+            celdaHabito.textContent = habito ? habito.nombre : "No encontrado";
+
+            const celdaFecha = document.createElement("td");
+            celdaFecha.textContent = registro.fecha;
+
+            const celdaObservaciones = document.createElement("td");
+            celdaObservaciones.textContent =
+                registro.observaciones || "Sin observaciones";
+
+            const celdaEstado = document.createElement("td");
+            celdaEstado.textContent = registro.cumplido ? "Cumplido" : "Fallado";
+
+            if (registro.cumplido) {
+                cumplidos++;
+            } else {
+                fallados++;
+            }
+
+            const celdaAcciones = document.createElement("td");
+            const boton = document.createElement("button");
+
+            boton.textContent = "Cambiar";
+            boton.type = "button";
+
+            boton.addEventListener("click", function() {
+                window.opener.toggleCumplido(registro.id);
+                mostrarRegistros();
+            });
+
+            celdaAcciones.appendChild(boton);
+
+            fila.append(
+                celdaHabito,
+                celdaFecha,
+                celdaObservaciones,
+                celdaEstado,
+                celdaAcciones
+            );
+
+            tabla.appendChild(fila);
+        });
+
+        resumen.textContent =
+            "Cumplidos: " + cumplidos + " | Fallados: " + fallados;
+    }
+
+    mostrarRegistros();
+</script>
+
+</body>
+</html>
