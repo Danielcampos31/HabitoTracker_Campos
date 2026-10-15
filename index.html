@@ -8,12 +8,16 @@
     <script src="app.js" defer></script>
 </head>
 <body>
+    <nav id="menu">
+    <a href="#inicio">Inicio</a>
+    <a href="#seguimiento" id="abrir-modal">Ver seguimiento</a>
+</nav>
     <header>
         <h1>HábitoTracker</h1>
         <p>Gestor de hábitos y seguimiento diario</p>
     </header>
 
-    <main>
+    <main id="inicio">
         <h2>Crear un hábito</h2>
 
         <form id="form-habito">
@@ -63,5 +67,27 @@
 
         <p id="estado">Aplicación preparada.</p>
     </main>
+    <div class="modal oculto" id="modal-seguimiento">
+    <div class="modal-contenido">
+        <div class="modal-cabecera">
+            <h2>Seguimiento de hábitos</h2>
+            <button type="button" id="cerrar-modal" aria-label="Cerrar">✕</button>
+        </div>
+
+        <p id="resumen-registros">Cumplidos: 0 | Fallados: 0</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Hábito</th>
+                    <th>Fecha</th>
+                    <th>Observaciones</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-registros"></tbody>
+        </table>
+    </div>
+</div>
 </body>
 </html>

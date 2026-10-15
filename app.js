@@ -198,3 +198,81 @@ document.getElementById("form-registro").addEventListener("submit", crearRegistr
 console.log("HábitoTracker iniciado.");
 console.log("Hábitos recuperados:", habitos);
 console.log("Registros recuperados:", registros);
+
+// Genera la tabla de seguimiento con los registros guardados.
+function mostrarRegistros() {
+const tabla = document.getElementById("tabla-registros");
+const resumen = document.getElementById("resumen-registros");
+
+tabla.innerHTML = "";
+
+let cumplidos = 0;
+let fallados = 0;
+
+registros.forEach(function(registro) {
+    // Busca el hábito al que pertenece el registro.
+    const habito = habitos.find(function(elemento) {
+        return elemento.id === registro.habitoId;
+    });
+
+    const fila = document.createElement("tr");
+
+    const celdaHabito = document.createElement("td");
+    celdaHabito.textContent = habito ? habito.nombre : "Hábito no encontrado";
+
+    const celdaFecha = document.createElement("td");
+    celdaFecha.textContent = registro.fecha;
+
+    const celdaObservaciones = document.createElement("td");
+    celdaObservaciones.textContent = registro.observaciones || "Sin observaciones";
+
+    const celdaEstado = document.createElement("td");
+
+    if (registro.cumplido) {
+        celdaEstado.textContent = "✓ Cumplido";
+        celdaEstado.style.color = "green";
+        cumplidos++;
+    } else {
+        celdaEstado.textContent = "✗ Fallado";
+        celdaEstado.style.color = "red";
+        fallados++;
+    }
+
+    fila.appendChild(celdaHabito);
+    fila.appendChild(celdaFecha);
+    fila.appendChild(celdaObservaciones);
+    fila.appendChild(celdaEstado);
+
+    tabla.appendChild(fila);
+});
+
+resumen.textContent =
+    "Cumplidos: " + cumplidos + " | Fallados: " + fallados;
+
+}
+
+// Abre el modal de seguimiento.
+function abrirModal() {
+mostrarRegistros();
+document.getElementById("modal-seguimiento").classList.remove("oculto");
+}
+
+// Cierra el modal de seguimiento.
+function cerrarModal() {
+document.getElementById("modal-seguimiento").classList.add("oculto");
+}
+
+// Configura los eventos del menú y del modal.
+document.getElementById("abrir-modal").addEventListener("click", function(evento) {
+evento.preventDefault();
+abrirModal();
+});
+
+document.getElementById("cerrar-modal").addEventListener("click", cerrarModal);
+
+// Cierra el modal al pulsar en el fondo oscuro.
+document.getElementById("modal-seguimiento").addEventListener("click", function(evento) {
+if (evento.target === this) {
+cerrarModal();
+}
+});
