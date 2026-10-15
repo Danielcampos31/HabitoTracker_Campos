@@ -42,7 +42,7 @@ function guardarTodo() {
     guardarCookie("registros", registros);
 }
 
-// Recupera los dos arrays al iniciar la aplicación.
+// Recupera los datos guardados.
 function cargarTodo() {
     const habitosGuardados = leerCookie("habitos");
     const registrosGuardados = leerCookie("registros");
@@ -51,7 +51,67 @@ function cargarTodo() {
     registros = Array.isArray(registrosGuardados) ? registrosGuardados : [];
 }
 
+// Muestra los hábitos en la página.
+function mostrarHabitos() {
+    const lista = document.getElementById("lista-habitos");
+
+    lista.innerHTML = "";
+
+    habitos.forEach(function(habito) {
+        const elemento = document.createElement("li");
+
+        elemento.textContent =
+            habito.nombre + " - " + habito.categoria +
+            (habito.descripcion ? " (" + habito.descripcion + ")" : "");
+
+        lista.appendChild(elemento);
+    });
+}
+
+// Crea un hábito al enviar el formulario.
+function crearHabito(evento) {
+    evento.preventDefault();
+
+    const nombre = document.getElementById("nombre").value.trim();
+    const descripcion = document.getElementById("descripcion").value.trim();
+    const categoria = document.getElementById("categoria").value;
+    const estado = document.getElementById("estado");
+
+    // Comprueba que el nombre no esté vacío.
+    if (nombre === "") {
+        estado.textContent = "Escribe un nombre para el hábito.";
+        return;
+    }
+
+    // Genera un identificador único.
+    const id = habitos.length > 0
+        ? Math.max(...habitos.map(habito => habito.id)) + 1
+        : 1;
+
+    // Crea el objeto del hábito.
+    const nuevoHabito = {
+        id: id,
+        nombre: nombre,
+        descripcion: descripcion,
+        categoria: categoria
+    };
+
+    // Añade el hábito, guarda los datos y actualiza la página.
+    habitos.push(nuevoHabito);
+    guardarTodo();
+    mostrarHabitos();
+
+    // Limpia el formulario.
+    document.getElementById("form-habito").reset();
+
+    estado.textContent = "Hábito creado correctamente.";
+}
+
+// Inicializa la aplicación.
 cargarTodo();
+mostrarHabitos();
+
+document.getElementById("form-habito").addEventListener("submit", crearHabito);
 
 console.log("HábitoTracker iniciado.");
 console.log("Hábitos recuperados:", habitos);
