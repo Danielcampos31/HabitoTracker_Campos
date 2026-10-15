@@ -86,6 +86,22 @@ function actualizarDesplegable() {
     });
 }
 
+// Actualiza las estadísticas de hábitos y registros.
+function actualizarEstadisticas() {
+    document.getElementById("total-habitos").textContent = habitos.length;
+
+    const cumplidos = registros.filter(function(registro) {
+        return registro.cumplido === true;
+    });
+
+    const fallados = registros.filter(function(registro) {
+        return registro.cumplido === false;
+    });
+
+    document.getElementById("dias-cumplidos").textContent = cumplidos.length;
+    document.getElementById("dias-fallados").textContent = fallados.length;
+}
+
 // Crea un hábito.
 function crearHabito(evento) {
     evento.preventDefault();
@@ -116,6 +132,7 @@ function crearHabito(evento) {
 
     mostrarHabitos();
     actualizarDesplegable();
+    actualizarEstadisticas();
 
     document.getElementById("form-habito").reset();
 
@@ -160,6 +177,7 @@ function crearRegistro(evento) {
 
     registros.push(nuevoRegistro);
     guardarTodo();
+    actualizarEstadisticas();
 
     document.getElementById("form-registro").reset();
 
@@ -181,6 +199,7 @@ function toggleCumplido(id) {
     registro.cumplido = !registro.cumplido;
 
     guardarTodo();
+    actualizarEstadisticas();
 
     console.log("Estado del registro actualizado:", registro);
 }
@@ -194,16 +213,48 @@ function abrirSeguimiento() {
     );
 }
 
+// Borra todos los hábitos y registros después de pedir confirmación.
+function borrarTodo() {
+    const confirmar = confirm(
+        "¿Seguro que quieres borrar todos los hábitos y registros?"
+    );
+
+    if (!confirmar) {
+        return;
+    }
+
+    borrarCookie("habitos");
+    borrarCookie("registros");
+
+    habitos = [];
+    registros = [];
+
+    // Actualiza las referencias que utiliza la ventana de seguimiento.
+    window.habitos = habitos;
+    window.registros = registros;
+
+    mostrarHabitos();
+    actualizarDesplegable();
+    actualizarEstadisticas();
+
+    document.getElementById("estado").textContent =
+        "Se han borrado todos los hábitos y registros.";
+
+    console.log("Todos los datos han sido borrados.");
+}
+
 // Recupera los datos guardados al iniciar.
 cargarTodo();
 
-// IMPORTANTE: compartir los arrays después de cargarlos.
+// Comparte los arrays y la función con la ventana secundaria.
 window.habitos = habitos;
 window.registros = registros;
 window.toggleCumplido = toggleCumplido;
 
+// Muestra los datos recuperados y las estadísticas iniciales.
 mostrarHabitos();
 actualizarDesplegable();
+actualizarEstadisticas();
 
 // Activa el formulario de creación de hábitos.
 document.getElementById("form-habito")
@@ -219,6 +270,10 @@ document.getElementById("abrir-modal")
         evento.preventDefault();
         abrirSeguimiento();
     });
+
+// Activa el botón para borrar todos los datos.
+document.getElementById("borrar-todo")
+    .addEventListener("click", borrarTodo);
 
 // Mensajes para comprobar el funcionamiento.
 console.log("HábitoTracker iniciado.");
